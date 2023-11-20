@@ -9,5 +9,5 @@ using System.Threading.Tasks;
 namespace Server.Data;
 public class LibraryDbContext : DbContext
 {
-    DbSet<User> Users { get; set; }
+   Book
 }
