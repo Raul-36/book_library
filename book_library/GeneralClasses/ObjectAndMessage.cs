@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace GeneralClasses
 {
-    internal class ObjectAndMessage
+    public class ObjectAndMessage<T>
     {
+        public T TObject { get; set; }
+        public string Message { get; set; }
     }
 }
