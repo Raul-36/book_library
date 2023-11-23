@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Server.SQLRepositories.Base;
 
-public interface IBookssSQLRepository
+public interface IBooksSQLRepository
 {
     public IEnumerable<Book> GetAll();
     public IEnumerable<Book> GetAll(IEnumerable<Predicate<Book>> predicates);
     public void Update(Book book);
-    public Book GetById(int id);
+    public Book? GetById(int id);
 }

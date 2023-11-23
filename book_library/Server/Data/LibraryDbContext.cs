@@ -10,8 +10,8 @@ namespace Server.Data;
 public class LibraryDbContext : DbContext
 {
     private const string connectionString = "Server=localhost;Database=LibraryDb;TrustServerCertificate=True;Trusted_Connection=True;";
-    DbSet<User> Users { get; set; }
-   DbSet<Book> Books { get; set; }
+    public DbSet<User> Users { get; set; }
+   public DbSet<Book> Books { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer(connectionString);
