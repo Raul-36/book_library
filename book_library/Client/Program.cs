@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 class Program
 {
-    const string baseAddress = "http://localhost:8080";
+    const string baseAddress = "http://localhost:3636";
     static HttpClient httpClient = new HttpClient();
 
     static async Task Main(string[] args)
@@ -55,7 +55,7 @@ class Program
         };
 
         var content = JsonContent.Create(newUser);
-        var response = await httpClient.PostAsync(baseAddress, content);
+        var response = await httpClient.PostAsync($"{baseAddress}/users", content);
 
         if (response.IsSuccessStatusCode)
         {
@@ -75,7 +75,14 @@ class Program
         Console.Write("Enter password: ");
         string password = Console.ReadLine();
 
-        var response = await httpClient.GetAsync($"{baseAddress}/login?name={name}&surname={password}");
+        var loginUser = new User
+        {
+            Name = name,
+            Password = password,
+        };
+
+        var content = JsonContent.Create(loginUser);
+        var response = await httpClient.PostAsync($"{baseAddress}/users/login", content);
 
         if (response.IsSuccessStatusCode)
         {
@@ -86,4 +93,5 @@ class Program
             Console.WriteLine($"Login error: {response.StatusCode}");
         }
     }
+
 }
