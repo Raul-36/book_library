@@ -6,15 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-<<<<<<< HEAD
-  <ItemGroup>
-    <ProjectReference Include="..\GeneralClasses\GeneralClasses.csproj" />
-  </ItemGroup>
-=======
+	
 	<ItemGroup>
 		<ProjectReference Include="..\GeneralClasses\GeneralClasses.csproj" />
 	</ItemGroup>
->>>>>>> client
+
 
 </Project>
