@@ -56,14 +56,17 @@ class Program
 
         var content = JsonContent.Create(newUser);
         var response = await httpClient.PostAsync($"{baseAddress}/users", content);
-
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("User successfully registered");
         }
         else
         {
-            Console.WriteLine($"Error during registration: {response.StatusCode}");
+            var responseTxt = await response.Content.ReadAsStringAsync();
+
+            System.Console.WriteLine($"Content: {responseTxt}");
+
+            Console.WriteLine($"Error during registration: ");
         }
     }
 

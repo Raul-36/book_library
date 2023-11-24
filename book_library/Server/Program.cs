@@ -25,6 +25,7 @@ while ( true)
 {
     HttpListenerContext context = listener.GetContext();
     var raw = context.Request.RawUrl;
+    Console.WriteLine( raw );
     if (raw.Contains("users"))
     {
         userRequestHandler.ProcessTheRequest(context);

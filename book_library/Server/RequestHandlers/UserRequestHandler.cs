@@ -153,7 +153,7 @@ public class UserRequestHandler
     {
         context.Response.ContentType = "text/plain";
         StreamWriter writer = new StreamWriter(context.Response.OutputStream); 
-        if (context.Request.ContentType != "application/json")
+        if (context.Request.ContentType.Contains("application/json") == false)
         {
             context.Response.StatusCode = 400;
             writer.WriteLine("incorrect content Type request");
@@ -179,7 +179,7 @@ public class UserRequestHandler
                 context.Response.StatusCode =200;
                 writer.WriteLine(user.Id);
             }
-            writer.Dispose();
         }
+        writer.Dispose();
     }
 }
