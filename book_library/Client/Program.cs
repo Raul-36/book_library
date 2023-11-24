@@ -54,8 +54,10 @@ class Program
             Password = password,
         };
 
-        var content = JsonContent.Create(newUser);
+        var jsonUser = JsonSerializer.Serialize(newUser);
+        var content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
         var response = await httpClient.PostAsync($"{baseAddress}/users", content);
+
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("User successfully registered");
@@ -64,7 +66,7 @@ class Program
         {
             var responseTxt = await response.Content.ReadAsStringAsync();
 
-            System.Console.WriteLine($"Content: {responseTxt}");
+            Console.WriteLine($"Content: {responseTxt}");
 
             Console.WriteLine($"Error during registration: ");
         }
