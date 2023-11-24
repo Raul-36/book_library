@@ -56,11 +56,18 @@ class Program
 
         var jsonUser = JsonSerializer.Serialize(newUser);
         var content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
+<<<<<<< HEAD
         var response = await httpClient.PostAsync($"{baseAddress}/users", content);
+=======
+
+        var response = await httpClient.PostAsync($"{baseAddress}/users/registration", content);
+        var responseTxt = await response.Content.ReadAsStringAsync();
+>>>>>>> client
 
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("User successfully registered");
+<<<<<<< HEAD
         }
         else
         {
@@ -68,20 +75,33 @@ class Program
 
             Console.WriteLine($"Content: {responseTxt}");
 
+=======
+            Console.WriteLine($"Your ID for login: {responseTxt}");
+        }
+        else
+        {
+            Console.WriteLine($"Content: {responseTxt}");
+>>>>>>> client
             Console.WriteLine($"Error during registration: ");
         }
     }
 
     static async Task Login()
     {
+<<<<<<< HEAD
         Console.Write("Enter name: ");
         string name = Console.ReadLine();
+=======
+        Console.Write("Enter ID: ");
+        int id = int.Parse(Console.ReadLine());
+>>>>>>> client
 
         Console.Write("Enter password: ");
         string password = Console.ReadLine();
 
         var loginUser = new User
         {
+<<<<<<< HEAD
             Name = name,
             Password = password,
         };
@@ -96,6 +116,34 @@ class Program
         else
         {
             Console.WriteLine($"Login error: {response.StatusCode}");
+=======
+            Id = id,
+            Password = password,
+        };
+
+        var jsonUser = JsonSerializer.Serialize(loginUser);
+        var content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync($"{baseAddress}/users/login", content);
+
+        var responseTxt = await response.Content.ReadAsStringAsync();
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var userOrMessage = JsonSerializer.Deserialize<ObjectAndMessage<User>>(responseContent);
+
+            if (userOrMessage != null && userOrMessage.TObject != null)
+            {
+                Console.WriteLine($"Login successful. User ID: {userOrMessage.TObject.Id}");
+            }
+            else
+            {
+                Console.WriteLine($"Login error: {userOrMessage?.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Login error: {responseTxt}");
+>>>>>>> client
         }
     }
 
