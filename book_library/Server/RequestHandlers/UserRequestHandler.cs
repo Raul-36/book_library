@@ -50,7 +50,7 @@ public class UserRequestHandler
         context.Response.ContentType = "application/json";
         StreamWriter writer = new StreamWriter(context.Response.OutputStream);
        
-        if (context.Request.ContentType != "application/json")
+        if (context.Request.ContentType.Contains("application/json") == false)
         {
             context.Response.StatusCode = 400;
             userOrMessage.Message = "incorrect content Type request";
@@ -111,7 +111,7 @@ public class UserRequestHandler
             context.Response.StatusCode = 404;
             writer.WriteLine("user not found");
         }
-        else if (context.Request.ContentType != "application/json")
+        else if (context.Request.ContentType.Contains("application/json") == false)
         {
             context.Response.StatusCode = 400;
             writer.WriteLine("incorrect content Type request");
