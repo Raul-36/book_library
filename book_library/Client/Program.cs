@@ -54,43 +54,60 @@ class Program
             Password = password,
         };
 
-        var content = JsonContent.Create(newUser);
+        var jsonUser = JsonSerializer.Serialize(newUser);
+        var content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
+
         var response = await httpClient.PostAsync($"{baseAddress}/users/registration", content);
+        var responseTxt = await response.Content.ReadAsStringAsync();
 
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("User successfully registered");
+            Console.WriteLine($"Your ID for login: {responseTxt}");
         }
         else
         {
-            Console.WriteLine($"Error during registration: {response.StatusCode}");
+            Console.WriteLine($"Content: {responseTxt}");
+            Console.WriteLine($"Error during registration: ");
         }
     }
 
     static async Task Login()
     {
-        Console.Write("Enter name: ");
-        string name = Console.ReadLine();
+        Console.Write("Enter ID: ");
+        int id = int.Parse(Console.ReadLine());
 
         Console.Write("Enter password: ");
         string password = Console.ReadLine();
 
         var loginUser = new User
         {
-            Name = name,
+            Id = id,
             Password = password,
         };
 
-        var content = JsonContent.Create(loginUser);
+        var jsonUser = JsonSerializer.Serialize(loginUser);
+        var content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
         var response = await httpClient.PostAsync($"{baseAddress}/users/login", content);
 
+        var responseTxt = await response.Content.ReadAsStringAsync();
         if (response.IsSuccessStatusCode)
         {
-            Console.WriteLine("Login successful");
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var userOrMessage = JsonSerializer.Deserialize<ObjectAndMessage<User>>(responseContent);
+
+            if (userOrMessage != null && userOrMessage.TObject != null)
+            {
+                Console.WriteLine($"Login successful. User ID: {userOrMessage.TObject.Id}");
+            }
+            else
+            {
+                Console.WriteLine($"Login error: {userOrMessage?.Message}");
+            }
         }
         else
         {
-            Console.WriteLine($"Login error: {response.StatusCode}");
+            Console.WriteLine($"Login error: {responseTxt}");
         }
     }
 
