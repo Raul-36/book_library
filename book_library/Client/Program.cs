@@ -56,67 +56,33 @@ class Program
 
         var jsonUser = JsonSerializer.Serialize(newUser);
         var content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
-<<<<<<< HEAD
-        var response = await httpClient.PostAsync($"{baseAddress}/users", content);
-=======
 
         var response = await httpClient.PostAsync($"{baseAddress}/users/registration", content);
         var responseTxt = await response.Content.ReadAsStringAsync();
->>>>>>> client
 
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("User successfully registered");
-<<<<<<< HEAD
-        }
-        else
-        {
-            var responseTxt = await response.Content.ReadAsStringAsync();
-
-            Console.WriteLine($"Content: {responseTxt}");
-
-=======
             Console.WriteLine($"Your ID for login: {responseTxt}");
         }
         else
         {
             Console.WriteLine($"Content: {responseTxt}");
->>>>>>> client
             Console.WriteLine($"Error during registration: ");
         }
     }
 
     static async Task Login()
     {
-<<<<<<< HEAD
-        Console.Write("Enter name: ");
-        string name = Console.ReadLine();
-=======
         Console.Write("Enter ID: ");
         int id = int.Parse(Console.ReadLine());
->>>>>>> client
 
         Console.Write("Enter password: ");
         string password = Console.ReadLine();
 
         var loginUser = new User
         {
-<<<<<<< HEAD
-            Name = name,
-            Password = password,
-        };
 
-        var content = JsonContent.Create(loginUser);
-        var response = await httpClient.PostAsync($"{baseAddress}/users/login", content);
-
-        if (response.IsSuccessStatusCode)
-        {
-            Console.WriteLine("Login successful");
-        }
-        else
-        {
-            Console.WriteLine($"Login error: {response.StatusCode}");
-=======
             Id = id,
             Password = password,
         };
@@ -143,7 +109,6 @@ class Program
         else
         {
             Console.WriteLine($"Login error: {responseTxt}");
->>>>>>> client
         }
     }
 
