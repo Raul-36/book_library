@@ -1,0 +1,12 @@
+[
+    {"Id": 0, "Name": "To Kill a Mockingbird", "Author": "Harper Lee", "UserId": null},
+    {"Id": 0, "Name": "1984", "Author": "George Orwell", "UserId": null},
+    {"Id": 0, "Name": "The Great Gatsby", "Author": "F. Scott Fitzgerald", "UserId": null},
+    {"Id": 0, "Name": "One Hundred Years of Solitude", "Author": "Gabriel Garcia Marquez", "UserId": null},
+    {"Id": 0, "Name": "Brave New World", "Author": "Aldous Huxley", "UserId": null},
+    {"Id": 0, "Name": "The Catcher in the Rye", "Author": "J.D. Salinger", "UserId": null},
+    {"Id": 0, "Name": "Pride and Prejudice", "Author": "Jane Austen", "UserId": null},
+    {"Id": 0, "Name": "The Hobbit", "Author": "J.R.R. Tolkien", "UserId": null},
+    {"Id": 0, "Name": "The Lord of the Rings", "Author": "J.R.R. Tolkien", "UserId": null},
+    {"Id": 0, "Name": "Harry Potter and the Sorcerer's Stone", "Author": "J.K. Rowling", "UserId": null}
+]
