@@ -1,4 +1,5 @@
-﻿using GeneralClasses;
+﻿using Client;
+using GeneralClasses;
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -75,7 +76,11 @@ class Program
     static async Task Login()
     {
         Console.Write("Enter ID: ");
-        int id = int.Parse(Console.ReadLine());
+        if (!int.TryParse(Console.ReadLine(), out int id))
+        {
+            Console.WriteLine("Invalid ID. Try again.");
+            return;
+        }
 
         Console.Write("Enter password: ");
         string password = Console.ReadLine();
@@ -99,6 +104,7 @@ class Program
             if (userOrMessage != null && userOrMessage.TObject != null)
             {
                 Console.WriteLine($"Login successful. User ID: {userOrMessage.TObject.Id}");
+                await ShowMenu(userOrMessage.TObject.Id, userOrMessage.TObject.Name);
             }
             else
             {
@@ -111,4 +117,52 @@ class Program
         }
     }
 
+    static async Task ShowMenu(int Id, string name)
+    {
+        var bookService = new BookService(httpClient, baseAddress);
+
+        while (true)
+        {
+            Console.WriteLine("1. Books");
+            Console.WriteLine("2. My book");
+            Console.WriteLine("3. Delete account");
+            Console.WriteLine("4. Exit");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    await bookService.DisplayAllBooks(Id);
+                    break;
+                case "2":
+                    await bookService.DisplayMyBooks(Id);
+                    break;
+                case "3":
+                    await DeleteAccount(name);
+                    break;
+                case "4":
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Wrong choice. try again");
+                    break;
+            }
+        }
+    }
+
+    static async Task DeleteAccount(string name)
+    {
+        var response = await httpClient.DeleteAsync($"{baseAddress}/delete/{name}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"User {name} account deleted");
+            Environment.Exit(0);
+        }
+        else
+        {
+            Console.WriteLine($"Error deleting account: {response.StatusCode}");
+        }
+    }
 }
