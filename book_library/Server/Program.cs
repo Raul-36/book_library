@@ -27,26 +27,29 @@ while ( true)
     HttpListenerContext context = listener.GetContext();
     var raw = context.Request.RawUrl;
     Console.WriteLine( raw );
-
-    bool containsUsers = raw.Contains("users");
-    bool containsBooks = raw.Contains("books");
-    if ((containsUsers && containsBooks) || (containsUsers == false && containsBooks == false))
+    _ = Task.Run(() =>
     {
-        using StreamWriter writer = new StreamWriter(context.Response.OutputStream);
-        context.Response.StatusCode = 400;
-        writer.WriteLine("incorrect request raw url");
-    }
-    else if (containsUsers)
-    {
-        usersRequestHandler.ProcessTheRequest(context);
-    }
-    else if (containsBooks)
-    {
-        booksRequestHandler.ProcessTheRequest(context);
-    }
+        bool containsUsers = raw.Contains("users");
+        bool containsBooks = raw.Contains("books");
+        if ((containsUsers && containsBooks) || (containsUsers == false && containsBooks == false))
+        {
+            using StreamWriter writer = new StreamWriter(context.Response.OutputStream);
+            context.Response.StatusCode = 400;
+            writer.WriteLine("incorrect request raw url");
+        }
+        else if (containsUsers)
+        {
+            usersRequestHandler.ProcessTheRequest(context);
+        }
+        else if (containsBooks)
+        {
+            booksRequestHandler.ProcessTheRequest(context);
+        }
 
 
+    });
 }
+    
 SimpleInjector.Container ContainerSetup()
 {
     var container = new SimpleInjector.Container();

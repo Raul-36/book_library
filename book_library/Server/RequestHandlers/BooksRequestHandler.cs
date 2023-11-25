@@ -170,6 +170,7 @@ public class BooksRequestHandler
             }
             else
             {
+                user = users.GetById(user.Id);
                 Book book = books.GetById(idToInt);
                 if (book.UserId != null)
                 {

@@ -33,7 +33,7 @@ public class BooksEFRepository : IBooksSQLRepository
         return context.Books.FirstOrDefault(b => b.Id == id);
     }
 
-    public void UpdateUserId(int id, Book book)
+    public async void UpdateUserId(int id, Book book)
     {
         /*if (book.Id == default)
             book.Id = id;
@@ -42,6 +42,6 @@ public class BooksEFRepository : IBooksSQLRepository
         var existingBook = new Book { Id = id };
         context.Books.Attach(existingBook);
         existingBook.UserId = book.UserId;
-        this.context.SaveChanges();
+        await this.context.SaveChangesAsync();
     }
 }
