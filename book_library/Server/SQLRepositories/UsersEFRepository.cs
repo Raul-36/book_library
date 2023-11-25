@@ -1,4 +1,5 @@
 ﻿using GeneralClasses;
+using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Server.SQLRepositories.Base;
 using System;
@@ -37,9 +38,15 @@ public class UsersEFRepository : IUsersSQLRepository
        return context.Users.FirstOrDefault(u => id == u.Id);
     }
 
-    public void Update(User user)
+    public void UpdateBookId(int id, User user)
     {
-       context.Update(user);
-        context.SaveChanges();
+        /*if (user.Id == default)
+            user.Id = id;
+
+        this.context.Users.Update(user);*/
+        var existingUser = new User { Id = id };
+        context.Users.Attach(existingUser); 
+        existingUser.BookId = user.BookId; 
+        this.context.SaveChanges();
     }
 }

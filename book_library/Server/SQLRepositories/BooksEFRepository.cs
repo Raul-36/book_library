@@ -14,33 +14,34 @@ public class BooksEFRepository : IBooksSQLRepository
     private LibraryDbContext context;
     public BooksEFRepository(LibraryDbContext context)
     {
-            context = context;
-    }
-    public IEnumerable<Book> GetAll()
-    {
-        return context.Books;
+        this.context = context;
     }
 
-    public IEnumerable<Book> GetAll(IEnumerable<Predicate<Book>> predicates)
+
+    public IEnumerable<Book> GetAll()
     {
-        Predicate<Book> predicate = book => {
-            foreach (var predicate in predicates) {
-                if (predicate(book) == false)
-                    return false;
-            }
-            return true;
-        };
-        return context.Books.Where(b => predicate(b));
+        if (context.Books.Count() > 0)
+        {
+            return context.Books.ToArray();
+        }
+        return Enumerable.Empty<Book>();
+
     }
 
     public Book? GetById(int id)
     {
-       return context.Books.FirstOrDefault(b => b.Id == id);
+        return context.Books.FirstOrDefault(b => b.Id == id);
     }
 
-    public void Update(Book book)
+    public void UpdateUserId(int id, Book book)
     {
-       context.Books.Update(book);
-        context.SaveChanges();
+        /*if (book.Id == default)
+            book.Id = id;
+
+        this.context.Books.Update(book);*/
+        var existingBook = new Book { Id = id };
+        context.Books.Attach(existingBook);
+        existingBook.UserId = book.UserId;
+        this.context.SaveChanges();
     }
 }
