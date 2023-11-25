@@ -56,21 +56,21 @@ namespace Client
 
         public async Task TakeABook(int userId, int bookId, string bookName, string bookAuthor)
         {
-            var takeBookData = new
+            var takeBookData = new Book
             {
+                Id = bookId,
+                Name = bookName,
+                Author = bookAuthor,
                 UserId = userId,
-                BookId = bookId,
-                BookName = bookName,
-                BookAuthor = bookAuthor,
             };
 
             var content = new StringContent(JsonSerializer.Serialize(takeBookData), Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PostAsync($"{baseAddress}/books/take", content);
+            var response = await httpClient.PutAsync($"{baseAddress}/books/borrow?id={bookId}", content);
 
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"Book {bookId} taken successfully.");
+                Console.WriteLine($"Book {bookName} taken successfully.");
             }
             else
             {
@@ -80,17 +80,28 @@ namespace Client
 
         public async Task DisplayMyBooks(int userId)
         {
-            var response = await httpClient.GetAsync($"{baseAddress}/books/mybooks?userId={userId}");
+            var response = await httpClient.GetAsync($"{baseAddress}/books/mybooks?id={userId}");
 
             if (response.IsSuccessStatusCode)
             {
-                var myBooks = await response.Content.ReadAsStreamAsync();
-                var books = JsonSerializer.Deserialize<List<Book>>(myBooks);
+                var myBooksStream = await response.Content.ReadAsStreamAsync();
+                var myBooks = JsonSerializer.Deserialize<List<Book>>(myBooksStream);
 
                 Console.WriteLine("List of your books:");
-                foreach (var book in books)
+                for (int i = 0; i < myBooks.Count; i++)
                 {
-                    Console.WriteLine($"ID: {book.Id}, Name: {book.Name}, Author: {book.Author}");
+                    Console.WriteLine($"{i + 1}. ID: {myBooks[i].Id}, Name: {myBooks[i].Name}, Author: {myBooks[i].Author}");
+                }
+
+                Console.Write("Enter the number of the book you want to return (or 0 to cancel): ");
+                int choice;
+                if (int.TryParse(Console.ReadLine(), out choice) && choice >= 1 && choice <= myBooks.Count)
+                {
+                    await ReturnBook(userId, myBooks[choice - 1].Id);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice or canceled.");
                 }
             }
             else
@@ -98,5 +109,28 @@ namespace Client
                 Console.WriteLine($"Error getting your books: {response.StatusCode}");
             }
         }
+
+        public async Task ReturnBook(int userId, int bookId)
+        {
+            var returnBookData = new
+            {
+                UserId = userId,
+                BookId = bookId
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(returnBookData), Encoding.UTF8, "application/json");
+
+            var response = await httpClient.PutAsync($"{baseAddress}/books/return", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Book {bookId} returned successfully.");
+            }
+            else
+            {
+                Console.WriteLine($"Error returning the book: {response.StatusCode}");
+            }
+        }
+
     }
 }
