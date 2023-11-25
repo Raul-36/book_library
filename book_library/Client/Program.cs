@@ -90,12 +90,12 @@ class Program
         var content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
         var response = await httpClient.PostAsync($"{baseAddress}/users/login", content);
 
-        var responseTxt = await response.Content.ReadAsStringAsync();
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var userOrMessage = JsonSerializer.Deserialize<ObjectAndMessage<User>>(responseContent);
+
         if (response.IsSuccessStatusCode)
         {
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var userOrMessage = JsonSerializer.Deserialize<ObjectAndMessage<User>>(responseContent);
-
             if (userOrMessage != null && userOrMessage.TObject != null)
             {
                 Console.WriteLine($"Login successful. User ID: {userOrMessage.TObject.Id}");
@@ -107,7 +107,7 @@ class Program
         }
         else
         {
-            Console.WriteLine($"Login error: {responseTxt}");
+            Console.WriteLine($"Login error: {userOrMessage?.Message}");
         }
     }
 
