@@ -11,7 +11,6 @@ namespace Server.SQLRepositories.Base;
 public interface IBooksSQLRepository
 {
     public IEnumerable<Book> GetAll();
-    public IEnumerable<Book> GetAll(IEnumerable<Predicate<Book>> predicates);
-    public void Update(Book book);
+    public void UpdateUserId(int id,Book book);
     public Book? GetById(int id);
 }

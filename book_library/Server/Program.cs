@@ -5,17 +5,18 @@ using System.ComponentModel;
 using System.Net;
 using SimpleInjector;
 using Server.RequestHandlers;
+using System.Xml.Linq;
+using GeneralClasses;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
-var container = new SimpleInjector.Container();
+var container = ContainerSetup();
+//if (container.GetInstance<IBooksSQLRepository>().GetAll().Count() == 0)
 
-container.RegisterSingleton<LibraryDbContext>();
-container.RegisterSingleton<IUsersSQLRepository, UsersEFRepository>();
-container.RegisterSingleton<IBooksSQLRepository, BooksEFRepository>();
-
-container.Verify();
-
-UserRequestHandler userRequestHandler = new UserRequestHandler(container.GetInstance<IUsersSQLRepository>());
-
+UsersRequestHandler usersRequestHandler = new UsersRequestHandler(container.GetInstance<IUsersSQLRepository>());
+BooksRequestHandler booksRequestHandler = new BooksRequestHandler(container.GetInstance<IBooksSQLRepository>(), container.GetInstance<IUsersSQLRepository>());
+container.GetInstance<LibraryDbContext>().Database.Migrate();
+container.GetInstance<LibraryDbContext>().ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking; ;
 HttpListener listener = new HttpListener();
 const int port = 3636;
 listener.Prefixes.Add($"http://localhost:{port}/");
@@ -26,9 +27,34 @@ while ( true)
     HttpListenerContext context = listener.GetContext();
     var raw = context.Request.RawUrl;
     Console.WriteLine( raw );
-    if (raw.Contains("users"))
+
+    bool containsUsers = raw.Contains("users");
+    bool containsBooks = raw.Contains("books");
+    if ((containsUsers && containsBooks) || (containsUsers == false && containsBooks == false))
     {
-        userRequestHandler.ProcessTheRequest(context);
+        using StreamWriter writer = new StreamWriter(context.Response.OutputStream);
+        context.Response.StatusCode = 400;
+        writer.WriteLine("incorrect request raw url");
     }
-  
+    else if (containsUsers)
+    {
+        usersRequestHandler.ProcessTheRequest(context);
+    }
+    else if (containsBooks)
+    {
+        booksRequestHandler.ProcessTheRequest(context);
+    }
+
+
 }
+SimpleInjector.Container ContainerSetup()
+{
+    var container = new SimpleInjector.Container();
+
+    container.RegisterSingleton<LibraryDbContext>();
+    container.RegisterSingleton<IUsersSQLRepository, UsersEFRepository>();
+    container.RegisterSingleton<IBooksSQLRepository, BooksEFRepository>();
+    container.Verify();
+    return container;
+}
+

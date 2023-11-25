@@ -12,19 +12,25 @@ using System.Threading.Tasks;
 
 namespace Server.RequestHandlers;
 
-public class UserRequestHandler
+public class UsersRequestHandler
 {
     IUsersSQLRepository usersSQLRepository;
 
-    public UserRequestHandler(IUsersSQLRepository usersSQLRepository)
+    public UsersRequestHandler(IUsersSQLRepository usersSQLRepository)
     {
         this.usersSQLRepository = usersSQLRepository;       
     }
     public void ProcessTheRequest(HttpListenerContext context)
     {
         if (context.Request.RawUrl.Contains("users") == false)
+        {
+            using StreamWriter writer = new StreamWriter(context.Response.OutputStream);
+            context.Response.StatusCode = 500;
+            writer.WriteLine("Server ERROR");
+
             throw new Exception("unprocessed raw");
-        if (context.Request.HttpMethod == HttpMethod.Get.Method)
+        }
+        if (context.Request.RawUrl.Contains("/users/login"))
         {
             Login(context);
         }
@@ -89,9 +95,9 @@ public class UserRequestHandler
                     userOrMessage.Message = "incorrect ID or password";
                 }
             }
-            writer.WriteLine(JsonSerializer.Serialize(userOrMessage));
-            writer.Dispose();
         }
+        writer.WriteLine(JsonSerializer.Serialize(userOrMessage));
+        writer.Dispose();
     }
 
 
