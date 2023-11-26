@@ -31,6 +31,9 @@ public class BooksRequestHandler
         }
         if (context.Request.HttpMethod == HttpMethod.Get.Method)
         {
+            if (context.Request.RawUrl.Contains("mybooks") == true)
+                GetMyBooks(context);
+            else
             GetBooks(context);
         }
         else if (context.Request.HttpMethod == HttpMethod.Put.Method)
@@ -53,7 +56,33 @@ public class BooksRequestHandler
             writer.WriteLine("incorrect request method");
         }
     }
-   
+
+    private void GetMyBooks(HttpListenerContext context) {
+        context.Response.ContentType = "application/json";
+        StreamWriter writer = new StreamWriter(context.Response.OutputStream);
+
+        var id = context.Request.QueryString["id"];
+        int idToInt;
+        if (id == null || (int.TryParse(id, out idToInt)) == false)
+        {
+            context.Response.StatusCode = 400;
+            writer.WriteLine("id not passed");
+        }
+        else if (users.GetById(idToInt) == null)
+        {
+            context.Response.StatusCode = 404;
+            writer.WriteLine("user not found");
+        }
+
+        else 
+        {
+            context.Response.StatusCode = 200;
+            writer.WriteLine(JsonSerializer.Serialize(books.GetAll().Where(b => b.UserId == users.GetById(idToInt).Id)));
+        }
+    writer.Dispose();
+    }
+    
+
     private void GetBooks(HttpListenerContext context)
     {
         context.Response.ContentType = "application/json";
@@ -98,11 +127,6 @@ public class BooksRequestHandler
                 context.Response.StatusCode = 400;
                 writer.WriteLine("null was sent instead of a value");
             }
-            else if (user.Password != (users.GetById(idToInt)?.Password ?? string.Empty))
-            {
-                context.Response.StatusCode = 401;
-                writer.WriteLine("the sent data does not match the user data");
-            }
             else
             {
                 Book book = books.GetById(idToInt);
@@ -114,10 +138,7 @@ public class BooksRequestHandler
                 else
                 {
                     book.UserId = null;
-                    user.BookId = null;
-                    books.UpdateUserId(book.Id,book);
-                    users.UpdateBookId(user.Id, user);
-
+                    books.UpdateUserId(book.Id,book);        
                     context.Response.StatusCode = 200;
                     writer.WriteLine("book returned");
                 }
@@ -163,11 +184,6 @@ public class BooksRequestHandler
                 context.Response.StatusCode = 400;
                 writer.WriteLine("null was sent instead of a value");
             }
-            else if (user.Password != (users.GetById(user.Id)?.Password ?? string.Empty))
-            {
-                context.Response.StatusCode = 401;
-                writer.WriteLine("the sent data does not match the user data");
-            }
             else
             {
                 user = users.GetById(user.Id);
@@ -177,17 +193,12 @@ public class BooksRequestHandler
                     context.Response.StatusCode = 409;
                     writer.WriteLine("book is busy");
                 }
-                else if (user.BookId != null)
-                {
-                    context.Response.StatusCode = 409;
-                    writer.WriteLine("you cannot take out a new book until you return the one you are reading now");
-                }
                 else
                 {
                     book.UserId = user.Id;
-                    user.BookId = book.Id;
+                   
                     books.UpdateUserId(book.Id, book);
-                    users.UpdateBookId(user.Id, user);
+                   
 
                     context.Response.StatusCode = 200;
                     writer.WriteLine("book borrowed");

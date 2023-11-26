@@ -23,11 +23,7 @@ public class LibraryDbContext : DbContext
         modelBuilder.Entity<User>().HasKey(u => u.Id);
         modelBuilder.Entity<User>().Property(u => u.Name).IsRequired();
         modelBuilder.Entity<User>().Property(u => u.Password).IsRequired();
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.Book)
-            .WithOne(b => b.User)       
-            .HasForeignKey<Book>(b => b.UserId); 
-          
+      
 
         modelBuilder.Entity<Book>().HasKey(b => b.Id);
         modelBuilder.Entity<Book>().Property(b => b.Name).IsRequired();
