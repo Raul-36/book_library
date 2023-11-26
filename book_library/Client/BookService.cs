@@ -15,7 +15,7 @@ namespace Client
             this.baseAddress = baseAddress;
         }
 
-        public async Task DisplayAllBooks(int userId)
+        public async Task DisplayAllBooks(int userId, User user)
         {
             var response = await httpClient.GetAsync($"{baseAddress}/books/all");
 
@@ -41,7 +41,7 @@ namespace Client
                 int choice;
                 if (int.TryParse(Console.ReadLine(), out choice) && choice >= 1 && choice <= books.Count)
                 {
-                    await TakeABook(userId, books[choice - 1].Id, books[choice - 1].Name, books[choice - 1].Author);
+                    await TakeABook(userId, books[choice - 1].Id, books[choice - 1].Name, books[choice - 1].Author, user);
                 }
                 else
                 {
@@ -54,17 +54,9 @@ namespace Client
             }
         }
 
-        public async Task TakeABook(int userId, int bookId, string bookName, string bookAuthor)
+        public async Task TakeABook(int userId, int bookId, string bookName, string bookAuthor, User user)
         {
-            var takeBookData = new Book
-            {
-                Id = bookId,
-                Name = bookName,
-                Author = bookAuthor,
-                UserId = userId,
-            };
-
-            var content = new StringContent(JsonSerializer.Serialize(takeBookData), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
 
             var response = await httpClient.PutAsync($"{baseAddress}/books/borrow?id={bookId}", content);
 
@@ -78,7 +70,8 @@ namespace Client
             }
         }
 
-        public async Task DisplayMyBooks(int userId)
+
+        public async Task DisplayMyBooks(int userId, User user)
         {
             var response = await httpClient.GetAsync($"{baseAddress}/books/mybooks?id={userId}");
 
@@ -97,7 +90,7 @@ namespace Client
                 int choice;
                 if (int.TryParse(Console.ReadLine(), out choice) && choice >= 1 && choice <= myBooks.Count)
                 {
-                    await ReturnBook(userId, myBooks[choice - 1].Id);
+                    await ReturnBook(user, myBooks[choice - 1].Id);
                 }
                 else
                 {
@@ -110,17 +103,16 @@ namespace Client
             }
         }
 
-        public async Task ReturnBook(int userId, int bookId)
+        public async Task ReturnBook(User user, int bookId)
         {
-            var returnBookData = new
+            var returnBookData = new 
             {
-                UserId = userId,
                 BookId = bookId
             };
 
-            var content = new StringContent(JsonSerializer.Serialize(returnBookData), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PutAsync($"{baseAddress}/books/return", content);
+            var response = await httpClient.PutAsync($"{baseAddress}/books/return?id={bookId}", content);
 
             if (response.IsSuccessStatusCode)
             {

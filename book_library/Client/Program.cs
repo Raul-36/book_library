@@ -105,7 +105,7 @@ class Program
             if (userOrMessage != null && userOrMessage.TObject != null)
             {
                 Console.WriteLine($"Login successful. User ID: {userOrMessage.TObject.Id}");
-                await ShowMenu(userOrMessage.TObject.Id, userOrMessage.TObject.Name, userOrMessage.TObject.Password);
+                await ShowMenu(userOrMessage.TObject.Id, userOrMessage.TObject.Password, loginUser);
             }
             else
             {
@@ -118,7 +118,7 @@ class Program
         }
     }
 
-    static async Task ShowMenu(int Id, string name, string password)
+    static async Task ShowMenu(int Id, string password, User user)
     {
         var bookService = new BookService(httpClient, baseAddress);
 
@@ -134,10 +134,10 @@ class Program
             switch (choice)
             {
                 case "1":
-                    await bookService.DisplayAllBooks(Id);
+                    await bookService.DisplayAllBooks(Id, user);
                     break;
                 case "2":
-                    await bookService.DisplayMyBooks(Id);
+                    await bookService.DisplayMyBooks(Id, user);
                     break;
                 case "3":
                     await DeleteAccount(Id, password);
