@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Data;
 
@@ -11,9 +12,11 @@ using Server.Data;
 namespace Server.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    partial class LibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231125235802_newInitialMigration")]
+    partial class newInitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,7 +46,9 @@ namespace Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Books");
                 });
@@ -55,6 +60,9 @@ namespace Server.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BookId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -72,10 +80,15 @@ namespace Server.Migrations
             modelBuilder.Entity("GeneralClasses.Book", b =>
                 {
                     b.HasOne("GeneralClasses.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithOne("Book")
+                        .HasForeignKey("GeneralClasses.Book", "UserId");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("GeneralClasses.User", b =>
+                {
+                    b.Navigation("Book");
                 });
 #pragma warning restore 612, 618
         }

@@ -35,13 +35,11 @@ public class BooksEFRepository : IBooksSQLRepository
 
     public async void UpdateUserId(int id, Book book)
     {
-        /*if (book.Id == default)
+        if (book.Id == default)
             book.Id = id;
 
-        this.context.Books.Update(book);*/
-        var existingBook = new Book { Id = id };
-        context.Books.Attach(existingBook);
-        existingBook.UserId = book.UserId;
+        this.context.Books.Update(book);
+        
         await this.context.SaveChangesAsync();
     }
 }
