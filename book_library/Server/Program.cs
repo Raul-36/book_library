@@ -11,7 +11,6 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 
 var container = ContainerSetup();
-//if (container.GetInstance<IBooksSQLRepository>().GetAll().Count() == 0)
 
 UsersRequestHandler usersRequestHandler = new UsersRequestHandler(container.GetInstance<IUsersSQLRepository>());
 BooksRequestHandler booksRequestHandler = new BooksRequestHandler(container.GetInstance<IBooksSQLRepository>(), container.GetInstance<IUsersSQLRepository>());
