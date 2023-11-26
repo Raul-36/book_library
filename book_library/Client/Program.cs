@@ -1,6 +1,7 @@
 ﻿using Client;
 using GeneralClasses;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
@@ -87,7 +88,6 @@ class Program
 
         var loginUser = new User
         {
-
             Id = id,
             Password = password,
         };
@@ -105,7 +105,7 @@ class Program
             if (userOrMessage != null && userOrMessage.TObject != null)
             {
                 Console.WriteLine($"Login successful. User ID: {userOrMessage.TObject.Id}");
-                await ShowMenu(userOrMessage.TObject.Id, userOrMessage.TObject.Name);
+                await ShowMenu(userOrMessage.TObject.Id, userOrMessage.TObject.Name, userOrMessage.TObject.Password);
             }
             else
             {
@@ -118,7 +118,7 @@ class Program
         }
     }
 
-    static async Task ShowMenu(int Id, string name)
+    static async Task ShowMenu(int Id, string name, string password)
     {
         var bookService = new BookService(httpClient, baseAddress);
 
@@ -140,7 +140,7 @@ class Program
                     await bookService.DisplayMyBooks(Id);
                     break;
                 case "3":
-                    await DeleteAccount(name);
+                    await DeleteAccount(Id, password);
                     break;
                 case "4":
                     Environment.Exit(0);
@@ -152,13 +152,28 @@ class Program
         }
     }
 
-    static async Task DeleteAccount(string name)
+    static async Task DeleteAccount(int Id, string password)
     {
-        var response = await httpClient.DeleteAsync($"{baseAddress}/delete/{name}");
+        var deleteUserData = new
+        {
+            Id = Id,
+            Password = password
+        };
+
+        var content = new StringContent(JsonSerializer.Serialize(deleteUserData), Encoding.UTF8, "application/json");
+
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Delete,
+            RequestUri = new Uri($"{baseAddress}/users/delete?id={Id}"),
+            Content = content
+        };
+
+        var response = await httpClient.SendAsync(requestMessage);
 
         if (response.IsSuccessStatusCode)
         {
-            Console.WriteLine($"User {name} account deleted");
+            Console.WriteLine($"User {Id} account deleted");
             Environment.Exit(0);
         }
         else
@@ -166,4 +181,5 @@ class Program
             Console.WriteLine($"Error deleting account: {response.StatusCode}");
         }
     }
+
 }
